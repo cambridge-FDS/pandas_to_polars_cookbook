@@ -1,0 +1,11 @@
+name: polars_cookbook
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python
+  - matplotlib
+  - numpy
+  - pandas
+  - jupyter
+  - polars

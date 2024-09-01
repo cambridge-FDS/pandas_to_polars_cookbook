@@ -16,8 +16,35 @@ There are several chapters that guide you through how to use pandas in the [cook
 ### Set-up
 1. Fork this repo.
 2. Clone the forked repo and open it in VS Code.
-3. Create a virtual environment.
+3. Create a virtual environment from the environment.yml:
 4. Select this environment as your interpreter in VS Code.
+
+**Create a virtual environment from the environment.yml**
+
+a. Open the terminal
+
+b. Go to your workspace folder if you are not already in it: `cd path_to_repo`
+
+c. Then type `conda env create -f environment.yml`
+
+**Set Up VS Code to Use the New Environment**
+
+a. Open your project folder in VS Code.
+
+b. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) to open the Command Palette.
+
+c. Type "Python: Select Interpreter" and select it.
+
+d. From the list, choose the interpreter that matches your new Conda environment. 
+   It should look something like `polars_cookbook`.
+
+e. VS Code will now use this environment for running Python code in this project.
+
+**Verify the Setup**
+
+Open a Python file or create a new one. In the bottom-left corner of VS Code, 
+you should see the name of your Conda environment. This confirms that VS Code 
+is using the correct environment.
 
 ### First changes
 1. Create a branch called "chapter_1"
