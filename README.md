@@ -30,6 +30,7 @@ There are several chapters that guide you through how to use pandas in the [cook
    - Having started your pull request, have a look at your commit. Can you easily identify the changes you have made?
 5. Finish all the to-dos in chapter 1 (do not forget to add, commit, push after every to-do)
 6. Once you have done all to-dos in chapter 1, go back to [GitHub](https://github.com) and merge your branch into main.
+7. After merging in GitHub, don't forget to pull the changes locally. (First change to the main branch, and then do a git pull)
 
 ### Better changes
 Above you have seen that doing pull requests with jupyter notebooks are not very visually pleasing.
