@@ -1,5 +1,5 @@
 # %%
-import pandas as pd
+import polars as pl
 import matplotlib.pyplot as plt
 
 
@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 # This dataset is a list of how many people were on 7 different bike paths in Montreal, each day.
 
-broken_df = pd.read_csv("../data/bikes.csv", encoding="ISO-8859-1")
+broken_df = pl.read_csv("../data/bikes.csv", encoding="ISO-8859-1")
 
 # TODO: please load the data with the Polars library (do not forget to import Polars at the top of the script) and call it pl_broken_df
 
@@ -26,18 +26,19 @@ broken_df[:3]
 
 # * change the column separator to a `;`
 # * Set the encoding to `'latin1'` (the default is `'utf8'`)
-# * Parse the dates in the 'Date' column
-# * Tell it that our dates have the day first instead of the month first
-# * Set the index to be the 'Date' column
 
-fixed_df = pd.read_csv(
+fixed_df = pl.read_csv(
     "../data/bikes.csv",
-    sep=";",
-    encoding="latin1",
-    parse_dates=["Date"],
-    dayfirst=True,
-    index_col="Date",
+    separator=";",
+    encoding="latin1"
 )
+
+# * Convert the 'Date' column from string to date format
+# * Ensure the date is parsed with day first (day/month/year)
+
+fixed_df = fixed_df.with_columns(
+    pl.col("Date").str.strptime(pl.Date, "%d/%m/%Y")
+    )
 fixed_df[:3]
 
 # TODO: do the same (or similar) with polars
@@ -55,7 +56,8 @@ fixed_df["Berri 1"]
 
 # %%
 # Plotting is quite easy in Pandas
-fixed_df["Berri 1"].plot()
+
+fixed_df.plot.line(x="date", y="Berri 1", color="stock") 
 
 # TODO: how would you do this with a Polars data frame?
 
@@ -67,3 +69,5 @@ fixed_df["Berri 1"].plot()
 fixed_df.plot(figsize=(15, 10))
 
 # TODO: how would you do this with a Polars data frame? With Polars data frames you might have to use the Seaborn library and it mmight not work out of the box as with pandas.
+
+# %%
