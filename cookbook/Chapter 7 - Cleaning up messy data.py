@@ -213,3 +213,4 @@ requests_pl = pl.read_csv("/Users/hanxishi/Desktop/D100 FDS/pandas_to_polars_coo
 requests_pl = requests_pl.with_columns(fix_zip_codes(pl.col("Incident Zip")).alias("Incident Zip"))
 unique_zips = requests_pl.select("Incident Zip").unique()
 print(unique_zips)
+# %%
