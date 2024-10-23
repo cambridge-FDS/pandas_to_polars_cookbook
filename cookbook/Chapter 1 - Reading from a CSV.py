@@ -1,5 +1,5 @@
 # %%
-import pandas as pd
+import pandas as pl
 import matplotlib.pyplot as plt
 
 
@@ -11,13 +11,13 @@ import matplotlib.pyplot as plt
 
 # This dataset is a list of how many people were on 7 different bike paths in Montreal, each day.
 
-broken_df = pd.read_csv("../data/bikes.csv", encoding="ISO-8859-1")
+pl_broken_df = pl.read_csv("../data/bikes.csv", encoding="ISO-8859-1")
 
 # TODO: please load the data with the Polars library (do not forget to import Polars at the top of the script) and call it pl_broken_df
 
 # %%
 # Look at the first 3 rows
-broken_df[:3]
+pl_broken_df[:3]
 
 # TODO: do the same with your polars data frame, pl_broken_df
 
@@ -26,19 +26,23 @@ broken_df[:3]
 
 # * change the column separator to a `;`
 # * Set the encoding to `'latin1'` (the default is `'utf8'`)
-# * Parse the dates in the 'Date' column
-# * Tell it that our dates have the day first instead of the month first
-# * Set the index to be the 'Date' column
 
-fixed_df = pd.read_csv(
-    "../data/bikes.csv",
-    sep=";",
-    encoding="latin1",
-    parse_dates=["Date"],
-    dayfirst=True,
-    index_col="Date",
+
+pl_fixed_df = pl.read_csv(
+    "../data/bikes.csv", 
+    separator=";",
+    encoding="latin1"
 )
-fixed_df[:3]
+
+
+# * Convert the 'Date' column from string to date format
+# * Ensure the date is parsed with day first (day/month/year)
+
+pl_fixed_df = pl_fixed_df.with_columns(
+    pl.col("Date").str.strptime(pl.Date, "%d/%m/%Y")
+)
+
+pl_fixed_df[:3]
 
 # TODO: do the same (or similar) with polars
 
@@ -55,8 +59,7 @@ fixed_df["Berri 1"]
 
 # %%
 # Plotting is quite easy in Pandas
-fixed_df["Berri 1"].plot()
-
+fixed_df.plot.line(x="Date", y="Berri 1")  
 # TODO: how would you do this with a Polars data frame?
 
 
@@ -64,6 +67,11 @@ fixed_df["Berri 1"].plot()
 # We can also plot all the columns just as easily. We'll make it a little bigger, too.
 # You can see that it's more squished together, but all the bike paths behave basically the same -- if it's a bad day for cyclists, it's a bad day everywhere.
 
-fixed_df.plot(figsize=(15, 10))
+fixed_df.plot.line(x="Date", y="Berri 1") .properties(
+    width=800,  # Equivalent to figsize=(15, 10) in width and height
+    height=600
+)
 
 # TODO: how would you do this with a Polars data frame? With Polars data frames you might have to use the Seaborn library and it mmight not work out of the box as with pandas.
+
+# %%
