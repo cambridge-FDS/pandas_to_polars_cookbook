@@ -13,13 +13,13 @@ plt.rcParams["font.family"] = "sans-serif"
 # %%
 # One of the main problems with messy data is: how do you know if it's messy or not?
 # We're going to use the NYC 311 service request dataset again here, since it's big and a bit unwieldy.
-requests = pd.read_csv("C:/Users/Jingyi/Downloads/111/pandas_to_polars_cookbook/data/311-service-requests.csv", dtype="unicode")
+requests = pd.read_csv("../data/311-service-requests.csv", dtype="unicode")
 requests.head()
 
 # TODO: load the data with Polars
 import polars as pl
 pl_requests = pl.read_csv(
-    "C:/Users/Jingyi/Downloads/111/pandas_to_polars_cookbook/data/311-service-requests.csv",
+    "../data/311-service-requests.csv",
     schema_overrides={"Incident Zip": pl.Utf8}
 )
 
@@ -54,14 +54,14 @@ pl_requests["Incident Zip"].unique()
 # We can pass a `na_values` option to `pd.read_csv` to clean this up a little bit. We can also specify that the type of Incident Zip is a string, not a float.
 na_values = ["NO CLUE", "N/A", "0"]
 requests = pd.read_csv(
-    "C:/Users/Jingyi/Downloads/111/pandas_to_polars_cookbook/data/311-service-requests.csv", 
+    "../data/311-service-requests.csv", 
     na_values=na_values, dtype={"Incident Zip": str}
 )
 requests["Incident Zip"].unique()
 
 # TODO: please implement this with Polars
 pl_requests = pl.read_csv(
-    "C:/Users/Jingyi/Downloads/111/pandas_to_polars_cookbook/data/311-service-requests.csv",
+    "../data/311-service-requests.csv",
     null_values=na_values,  # Specify values to be treated as null
     schema_overrides={"Incident Zip": pl.Utf8}  # Specify the dtype for "Incident Zip" as string
 )
@@ -205,7 +205,7 @@ requests["Incident Zip"].unique()
 
 # TODO: please implement this with Polars
 pl_requests = pl.read_csv(
-    "C:/Users/Jingyi/Downloads/111/pandas_to_polars_cookbook/data/311-service-requests.csv",
+    "../data/311-service-requests.csv",
     null_values=na_values,
     schema_overrides={"Incident Zip": pl.Utf8} 
 )

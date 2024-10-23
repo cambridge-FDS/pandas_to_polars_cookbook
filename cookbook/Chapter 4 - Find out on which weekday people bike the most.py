@@ -14,7 +14,7 @@ pd.set_option("display.max_columns", 60)
 
 # %% Load the data
 bikes = pd.read_csv(
-    "C:/Users/Jingyi/Downloads/pandas_to_polars_cookbook/data/bikes.csv",
+    "../data/bikes.csv",
     sep=";",
     encoding="latin1",
     parse_dates=["Date"],
