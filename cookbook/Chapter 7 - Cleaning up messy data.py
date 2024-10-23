@@ -79,7 +79,9 @@ len(requests[rows_with_dashes])
 requests[rows_with_dashes]
 # FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`rows_with_dashes = requests["Incident Zip"].str.contains("-").fillna(False)
 # TODO: please implement this with Polars
-
+rows_with_dashes = requests_pl.filter(pl.col("Incident Zip").str.contains("-").fill_null(False))
+print(rows_with_dashes.shape[0])
+print(rows_with_dashes)
 
 # %%
 # I thought these were missing data and originally deleted them like this:
@@ -90,9 +92,6 @@ requests["Incident Zip"][long_zip_codes].unique()
 requests["Incident Zip"] = requests["Incident Zip"].str.slice(0, 5)
 
 # TODO: please implement this with Polars
-rows_with_dashes = requests_pl.filter(pl.col("Incident Zip").str.contains("-").fill_null(False))
-print(rows_with_dashes.shape[0])
-print(rows_with_dashes)
 
 # %%
 #  I'm still concerned about the 00000 zip codes, though: let's look at that.
