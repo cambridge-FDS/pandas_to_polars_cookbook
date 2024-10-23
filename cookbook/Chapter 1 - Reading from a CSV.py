@@ -1,5 +1,5 @@
 # %%
-import pandas as pl
+import polars as pl
 import matplotlib.pyplot as plt
 
 
@@ -52,14 +52,14 @@ pl_fixed_df[:3]
 # When you read a CSV, you get a kind of object called a `DataFrame`, which is made up of rows and columns. You get columns out of a DataFrame the same way you get elements out of a dictionary.
 
 # Here's an example:
-fixed_df["Berri 1"]
+pl_fixed_df["Berri 1"]
 
 # TODO: how would you do this with a Polars data frame?
 
 
 # %%
 # Plotting is quite easy in Pandas
-fixed_df.plot.line(x="Date", y="Berri 1")  
+pl_fixed_df.plot.line(x="Date", y="Berri 1")  
 # TODO: how would you do this with a Polars data frame?
 
 
@@ -67,7 +67,7 @@ fixed_df.plot.line(x="Date", y="Berri 1")
 # We can also plot all the columns just as easily. We'll make it a little bigger, too.
 # You can see that it's more squished together, but all the bike paths behave basically the same -- if it's a bad day for cyclists, it's a bad day everywhere.
 
-fixed_df.plot.line(x="Date", y="Berri 1") .properties(
+pl_fixed_df.plot.line(x="Date", y="Berri 1") .properties(
     width=800,  # Equivalent to figsize=(15, 10) in width and height
     height=600
 )
