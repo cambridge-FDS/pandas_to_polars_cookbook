@@ -15,7 +15,7 @@ broken_df = pd.read_csv("../data/bikes.csv", encoding="ISO-8859-1")
 """
 # TODO: please load the data with the Polars library (do not forget to import Polars at the top of the script) and call it pl_broken_df
 
-with open(r"C:\Users\SN-LOVE-THU\Downloads\bikes.csv", encoding="ISO-8859-1") as f:
+with open("../data/bikes.csv", encoding="ISO-8859-1") as f:
     csv_content = f.read()
 
 csv_file_like = io.StringIO(csv_content)
@@ -52,7 +52,7 @@ fixed_df[:3]
 
 # TODO: do the same (or similar) with polars
 pl_fixed_df = pl.read_csv(
-    r"C:\Users\SN-LOVE-THU\Downloads\bikes.csv",  
+   "../data/bikes.csv",  
     separator=";",                                  
     encoding="latin1",                             
 )
