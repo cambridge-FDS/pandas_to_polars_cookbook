@@ -13,10 +13,20 @@ plt.rcParams["font.family"] = "sans-serif"
 # %%
 # One of the main problems with messy data is: how do you know if it's messy or not?
 # We're going to use the NYC 311 service request dataset again here, since it's big and a bit unwieldy.
-requests = pd.read_csv("../data/311-service-requests.csv", dtype="unicode")
+requests = pd.read_csv("/Users/hanxishi/Desktop/pandas_to_polars_cookbook/data/311-service-requests.csv", dtype="unicode")
 requests.head()
 
 # TODO: load the data with Polars
+import polars as pl
+import matplotlib.pyplot as plt
+import numpy as np
+plt.style.use("ggplot")
+plt.rcParams["figure.figsize"] = (15, 5)
+plt.rcParams["font.family"] = "sans-serif"
+requests_pl = pl.read_csv(
+    "/Users/hanxishi/Desktop/pandas_to_polars_cookbook/data/311-service-requests.csv",
+    null_values="N/A", ignore_errors=True) 
+print(requests_pl.head())
 
 
 # %%
@@ -43,27 +53,35 @@ requests.head()
 requests["Incident Zip"].unique()
 
 # TODO: what's the Polars command for this?
+unique_zips = requests_pl["Incident Zip"].unique()
+print(unique_zips)
 
 # %%
 # Fixing the nan values and string/float confusion
 # We can pass a `na_values` option to `pd.read_csv` to clean this up a little bit. We can also specify that the type of Incident Zip is a string, not a float.
 na_values = ["NO CLUE", "N/A", "0"]
 requests = pd.read_csv(
-    "../data/311-service-requests.csv", na_values=na_values, dtype={"Incident Zip": str}
+    "/Users/hanxishi/Desktop/pandas_to_polars_cookbook/data/311-service-requests.csv", na_values=na_values, dtype={"Incident Zip": str}
 )
 requests["Incident Zip"].unique()
 
 # TODO: please implement this with Polars
-
+na_values = ["NO CLUE", "N/A", "0"]
+requests_pl = pl.read_csv("/Users/hanxishi/Desktop/pandas_to_polars_cookbook/data/311-service-requests.csv",
+    null_values=na_values, schema_overrides={"Incident Zip": pl.Utf8} )
+unique_zips = requests_pl["Incident Zip"].unique().to_list()
+print(unique_zips)
 
 # %%
 # What's up with the dashes?
 rows_with_dashes = requests["Incident Zip"].str.contains("-").fillna(False)
 len(requests[rows_with_dashes])
 requests[rows_with_dashes]
-
+# FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`rows_with_dashes = requests["Incident Zip"].str.contains("-").fillna(False)
 # TODO: please implement this with Polars
-
+rows_with_dashes = requests_pl.filter(pl.col("Incident Zip").str.contains("-").fill_null(False))
+print(rows_with_dashes.shape[0])
+print(rows_with_dashes)
 
 # %%
 # I thought these were missing data and originally deleted them like this:
@@ -75,7 +93,6 @@ requests["Incident Zip"] = requests["Incident Zip"].str.slice(0, 5)
 
 # TODO: please implement this with Polars
 
-
 # %%
 #  I'm still concerned about the 00000 zip codes, though: let's look at that.
 requests[requests["Incident Zip"] == "00000"]
@@ -83,9 +100,14 @@ requests[requests["Incident Zip"] == "00000"]
 zero_zips = requests["Incident Zip"] == "00000"
 requests.loc[zero_zips, "Incident Zip"] = np.nan
 
-# TODO: please implement this with Polars
-
-
+# TODO: please implement this with Polar
+zero_zips = requests_pl.filter(pl.col("Incident Zip") == "00000")
+print(zero_zips)
+requests_pl = requests_pl.with_columns(pl.when(pl.col("Incident Zip") == "00000")
+    .then(None)
+    .otherwise(pl.col("Incident Zip"))
+    .alias("Incident Zip"))
+print(requests_pl)
 # %%
 # Great. Let's see where we are now:
 unique_zips = requests["Incident Zip"].unique()
@@ -97,6 +119,9 @@ unique_zips
 # Amazing! This is much cleaner.
 
 # TODO: please implement this with Polars
+requests_pl = requests_pl.with_columns([pl.col("Incident Zip").fill_null("NaN").cast(pl.Utf8).alias("Incident Zip")])
+unique_zips = requests_pl.select("Incident Zip").unique().sort("Incident Zip")
+print(unique_zips)
 
 
 # %%
@@ -110,13 +135,36 @@ is_far = ~(is_close) & zips.notnull()
 zips[is_far]
 
 # TODO: please implement this with Polars
+zips = requests_pl["Incident Zip"]
+is_close = zips.str.starts_with("0") | zips.str.starts_with("1")
+is_far = ~is_close & zips.is_not_null()
+far_zips = requests_pl.filter(is_far)
+print(far_zips)
 
 
 # %%
-requests[is_far][["Incident Zip", "Descriptor", "City"]].sort_values("Incident Zip")
+#requests[is_far][["Incident Zip", "Descriptor", "City"]].sort_values("Incident Zip")
 # Okay, there really are requests coming from LA and Houston! Good to know.
 
 # TODO: please implement this with Polars
+import polars as pl
+
+# Load the data
+na_values = ["NO CLUE", "N/A", "0"]
+requests_pl = pl.read_csv(
+    "/Users/hanxishi/Desktop/D100 FDS/pandas_to_polars_cookbook/data/311-service-requests.csv",
+    null_values=na_values,
+    schema_overrides={"Incident Zip": pl.Utf8})
+
+# Create a mask for zips that do not start with '0' or '1'
+is_far = (~pl.col("Incident Zip").str.starts_with("0")) & (~pl.col("Incident Zip").str.starts_with("1"))
+
+# Filter the DataFrame and select the relevant columns
+far_requests = requests_pl.filter(is_far)[["Incident Zip", "Descriptor", "City"]].sort("Incident Zip")
+
+# Display the results
+print(far_requests)
+
 
 
 # %%
@@ -126,14 +174,18 @@ requests["City"].str.upper().value_counts()
 # It looks like these are legitimate complaints, so we'll just leave them alone.
 
 # TODO: please implement this with Polars
+zips = requests_pl["Incident Zip"]
+is_close = zips.str.starts_with("0") | zips.str.starts_with("1")
+is_far = ~is_close & zips.is_not_null()
+far_requests = requests_pl.filter(is_far).select(["Incident Zip", "Descriptor", "City"])
+sorted_far_requests = far_requests.sort("Incident Zip")
+print(sorted_far_requests)
 
 
 # %%
 # Let's turn this analysis into a function putting it all together:
 na_values = ["NO CLUE", "N/A", "0"]
-requests = pd.read_csv(
-    "../data/311-service-requests.csv", na_values=na_values, dtype={"Incident Zip": str}
-)
+requests = pd.read_csv("/Users/hanxishi/Desktop/pandas_to_polars_cookbook/data/311-service-requests.csv", na_values=na_values, dtype={"Incident Zip": str})
 
 
 def fix_zip_codes(zips):
@@ -152,5 +204,14 @@ requests["Incident Zip"] = fix_zip_codes(requests["Incident Zip"])
 requests["Incident Zip"].unique()
 
 # TODO: please implement this with Polars
-
+def fix_zip_codes(zips):
+    zips = zips.str.slice(0, 5)
+    return pl.when(zips == "00000").then(None).otherwise(zips)
+na_values = ["NO CLUE", "N/A", "0"]
+requests_pl = pl.read_csv("/Users/hanxishi/Desktop/pandas_to_polars_cookbook/data/311-service-requests.csv",null_values=na_values,schema_overrides={"Incident Zip": pl.Utf8})
+requests_pl = requests_pl.with_columns(fix_zip_codes(pl.col("Incident Zip")).alias("Incident Zip"))
+unique_zips = requests_pl.select("Incident Zip").unique()
+print(unique_zips)
 # %%
+
+
