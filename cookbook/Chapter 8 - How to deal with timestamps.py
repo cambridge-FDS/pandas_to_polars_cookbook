@@ -7,13 +7,16 @@ import pandas as pd
 
 # Read it, and remove the last row
 popcon = pd.read_csv(
-    "../data/popularity-contest",
-    sep=" ",
-)[:-1]
+    "/Users/hanxishi/Desktop/D100 FDS/pandas_to_polars_cookbook/data/popularity-contest",
+    sep=" ",)[:-1]
 popcon.columns = ["atime", "ctime", "package-name", "mru-program", "tag"]
-popcon[:5]
 
 # TODO: please reimplement this using Polars
+import polars as pl
+popcon_pl = pl.read_csv("/Users/hanxishi/Desktop/D100 FDS/pandas_to_polars_cookbook/data/popularity-contest",has_header=False,separator=' ' )
+popcon_pl = popcon_pl[:-1]
+popcon_pl.columns = ["atime", "ctime", "package-name", "mru-program", "tag"]
+print(popcon_pl)
 
 
 # %%
